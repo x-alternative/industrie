@@ -1,0 +1,24 @@
+name: Attach the compiled pdf to the Pull Request
+on: pull_request
+jobs:
+  example:
+    name: example
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: pip install latex dvips ps2pdf
+      - run: mkdir -p output/
+      - run: make
+      - uses: actions/upload-artifact@v1
+        with:
+          name: compiled_pdf
+          path: output
+      - uses: actions/download-artifact@v1
+        with:
+          name: compiled_pdf
+      - name: comment PR
+        uses: machine-learning-apps/pr-comment@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path: compiled_pdf/document.pdf
